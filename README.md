@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @EGJJR
 - 👀 I’m interested in tech, business, and music.
 - 🌱 I’m currently learning code in NC State University
-- 💞️ I’m looking to collaborate with software engineers/developers.
+- 💞️ I’m looking to collaborate with any software engineers/developers.
 - 📫 How to reach me ... josepheddjr@gmail.com
 
 <!---
