@@ -1,5 +1,5 @@
 
- Edd Joseph/ README.md
+ ### Edd Joseph/ README.md
 
 [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/EGJJR)
 [![GitLab](https://img.shields.io/badge/GitLab-330F63?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com/EGJJR)
@@ -8,8 +8,8 @@
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/@eddjosephjr/)
 
 ---
-
-- 💻 ** Software Engineer Internship (2025) ** at [AdventHealth](https://www.adventhealth.com/), in Alamonte Springs, Florida
+- 🤓 Feel free to checkout my [portfolio](https://www.eddjosephjr.com/) website!
+- 💻 Tech Internship (Summer 2025) at [AdventHealth](https://www.adventhealth.com/), in Alamonte Springs, Florida
 - 🛠️ I build with: `Python` `Django` `JavaScript` `React` `Next.js` `TailwindCSS` `Java` ...
 - ⚡ **Hobbies**: I enjoy cinematography, reading, playing basketball, playing the piano, and running :)
 - 📬 **Reach out to me**: [josepheddjr@gmail.com](mailto:josepheddjr@gmail.com)
