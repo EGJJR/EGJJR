@@ -1,10 +1,5 @@
-- 👋 Hi, I’m @EGJJR
--  I’m interested in tech, business, and music.
--  I’m currently learning code in Andrews University
--  I’m looking to collaborate with any software engineers/developers.
--  How to reach me ... josepheddjr@gmail.com
 
-  # Edd Joseph/ README.md
+ Edd Joseph/ README.md
 
 [![GitHub](https://img.shields.io/badge/GitHub-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/EGJJR)
 [![GitLab](https://img.shields.io/badge/GitLab-330F63?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com/EGJJR)
@@ -15,7 +10,7 @@
 ---
 
 - 💻 ** Software Engineer Internship (2025) ** at [AdventHealth](https://www.adventhealth.com/), in Alamonte Springs, Florida
-- 🛠️ I build with: `Python` `Django` `JavaScript` `React` `Next.js` `TailwindCSS` `Java`
+- 🛠️ I build with: `Python` `Django` `JavaScript` `React` `Next.js` `TailwindCSS` `Java` ...
 - ⚡ **Hobbies**: I enjoy cinematography, reading, playing basketball, playing the piano, and running :)
 - 📬 **Reach out to me**: [josepheddjr@gmail.com](mailto:josepheddjr@gmail.com)
 
