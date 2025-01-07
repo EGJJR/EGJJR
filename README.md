@@ -9,7 +9,6 @@
 
 ---
 - 🤓 Feel free to checkout my [portfolio](https://www.eddjosephjr.com/) website!
-- 💻 Tech Internship (Summer 2025) at [AdventHealth](https://www.adventhealth.com/), in Alamonte Springs, Florida
 - 🛠️ I build with: `Typescript` `Python` `Django` `JavaScript` `React` `Next.js` `TailwindCSS` `Java` ...
 - ⚡ **Hobbies**: I enjoy cinematography, reading, playing basketball, playing the piano, and running :)
 - 📬 **Reach out to me**: [josepheddjr@gmail.com](mailto:josepheddjr@gmail.com)
