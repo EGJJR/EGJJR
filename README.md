@@ -9,7 +9,7 @@
 
 ---
 - 🤓 Feel free to checkout my [portfolio](https://www.eddjosephjr.com/) website!
-- 🛠️ I build with: `Typescript` `Python` `Django` `JavaScript` `React` `Next.js` `TailwindCSS` `Java` ...
+- 🛠️ I build with: `Typescript` `Python` `JavaScript` `React` `Next.js` `TailwindCSS` `Java` ...
 - ⚡ **Hobbies**: I enjoy cinematography, reading, playing basketball, playing the piano, and running :)
 - 📬 **Reach out to me**: [josepheddjr@gmail.com](mailto:josepheddjr@gmail.com)
 
