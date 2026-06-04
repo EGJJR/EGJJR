@@ -84,6 +84,51 @@ async function fetchCalendar() {
   return cal;
 }
 
+// Aggregates bytes per language across the user's most-recently-pushed,
+// non-fork, non-archived repos. Forks/archives are excluded so the breakdown
+// reflects active personal work, not historical noise.
+async function fetchLanguages() {
+  const query = /* GraphQL */ `
+    query ($login: String!) {
+      user(login: $login) {
+        repositories(
+          first: 100
+          ownerAffiliations: OWNER
+          isFork: false
+          orderBy: { field: PUSHED_AT, direction: DESC }
+        ) {
+          nodes {
+            name
+            isArchived
+            languages(first: 10, orderBy: { field: SIZE, direction: DESC }) {
+              edges {
+                size
+                node { name color }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const data = await gql(query, { login: USERNAME });
+  const repos = data?.user?.repositories?.nodes ?? [];
+  const totals = new Map(); // name -> { bytes, color }
+  for (const repo of repos) {
+    if (repo.isArchived) continue;
+    for (const edge of repo.languages.edges) {
+      const cur = totals.get(edge.node.name) ?? { bytes: 0, color: edge.node.color };
+      cur.bytes += edge.size;
+      totals.set(edge.node.name, cur);
+    }
+  }
+  const arr = [...totals.entries()]
+    .map(([name, v]) => ({ name, bytes: v.bytes, color: v.color || '#888888' }))
+    .sort((a, b) => b.bytes - a.bytes);
+  const grand = arr.reduce((s, l) => s + l.bytes, 0);
+  return { langs: arr, total: grand };
+}
+
 // ─── Bucketing ──────────────────────────────────────────────────────────────
 
 // Quartiles of *non-zero* days so the chart self-scales — used to set
@@ -315,14 +360,128 @@ function renderSkyline(calendar, theme) {
 `;
 }
 
+// ─── Languages (horizontal stacked bar + legend) ────────────────────────────
+
+// Editorial card: one continuous bar across the top showing language proportions,
+// legend below it. Matches the skyline's typographic feel — quiet, two-tone.
+
+const LANG_LIGHT = {
+  name: 'lang-light',
+  bg: '#ffffff',
+  text: '#0a0a0a',
+  muted: '#6b7280',
+  trackBg: '#e5e7eb',
+};
+const LANG_DARK = {
+  name: 'lang-dark',
+  bg: '#0d1117',
+  text: '#c9d1d9',
+  muted: '#8b949e',
+  trackBg: '#161b22',
+};
+
+// Group anything past TOP_N into a single "Other" slice so the bar/legend
+// don't get cluttered with 1% slivers.
+const TOP_N = 6;
+
+function topLanguages({ langs, total }) {
+  if (langs.length <= TOP_N) return { items: langs, total };
+  const top = langs.slice(0, TOP_N);
+  const rest = langs.slice(TOP_N);
+  const otherBytes = rest.reduce((s, l) => s + l.bytes, 0);
+  if (otherBytes > 0) {
+    top.push({ name: 'Other', bytes: otherBytes, color: '#9ca3af' });
+  }
+  return { items: top, total };
+}
+
+function escapeXml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;'
+  }[c]));
+}
+
+function renderLanguages(raw, theme) {
+  const { items, total } = topLanguages(raw);
+  if (total === 0 || items.length === 0) {
+    // Graceful empty state — still emit valid SVG so README doesn't break.
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120"><rect width="600" height="120" fill="${theme.bg}" /><text x="20" y="60" fill="${theme.muted}" font-family="-apple-system, sans-serif" font-size="12">No language data available.</text></svg>`;
+  }
+
+  // Layout
+  const W = 820;
+  const padX = 24;
+  const padTop = 22;
+  const headerH = 36;     // room for title + total bytes
+  const barH = 14;
+  const barY = padTop + headerH;
+  const legendY = barY + barH + 22;
+  const legendCols = 3;   // 6 items + Other -> two rows of three
+  const legendRowH = 22;
+  const legendRows = Math.ceil(items.length / legendCols);
+  const H = legendY + legendRows * legendRowH + 16;
+
+  const barX = padX;
+  const barW = W - padX * 2;
+
+  // ── Stacked bar ─────────────────────────────────────────────────────────
+  // Draw the track first so any rounding gap on the right edge stays subtle,
+  // then layer language segments clipped to the rounded track for clean corners.
+  const clipId = `bar-clip-${theme.name}`;
+  let bar = `<rect x="${barX}" y="${barY}" width="${barW}" height="${barH}" rx="${barH / 2}" fill="${theme.trackBg}" />`;
+  let cursor = 0;
+  for (const lang of items) {
+    const segW = (lang.bytes / total) * barW;
+    bar += `<rect x="${(barX + cursor).toFixed(2)}" y="${barY}" width="${segW.toFixed(2)}" height="${barH}" fill="${lang.color}" clip-path="url(#${clipId})" />`;
+    cursor += segW;
+  }
+
+  // ── Legend ──────────────────────────────────────────────────────────────
+  const colW = barW / legendCols;
+  const dotR = 4;
+  const legend = items.map((lang, i) => {
+    const row = Math.floor(i / legendCols);
+    const col = i % legendCols;
+    const x = barX + col * colW;
+    const y = legendY + row * legendRowH;
+    const pct = ((lang.bytes / total) * 100).toFixed(1);
+    return `
+      <g transform="translate(${x}, ${y})">
+        <circle cx="${dotR}" cy="0" r="${dotR}" fill="${lang.color}" />
+        <text x="${dotR * 2 + 6}" y="3" fill="${theme.text}" font-size="11" font-weight="500">${escapeXml(lang.name)}</text>
+        <text x="${dotR * 2 + 6}" y="16" fill="${theme.muted}" font-size="10">${pct}%</text>
+      </g>`;
+  }).join('');
+
+  const totalKb = Math.round(total / 1024).toLocaleString();
+  const header = `
+    <text x="${padX}" y="${padTop + 12}" fill="${theme.text}" font-size="13" font-weight="600">Most-used languages</text>
+    <text x="${padX}" y="${padTop + 28}" fill="${theme.muted}" font-size="10">${totalKb} KB across active repositories</text>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <clipPath id="${clipId}">
+      <rect x="${barX}" y="${barY}" width="${barW}" height="${barH}" rx="${barH / 2}" />
+    </clipPath>
+  </defs>
+  <rect width="${W}" height="${H}" fill="${theme.bg}" />
+  ${header}
+  ${bar}
+  ${legend}
+</svg>
+`;
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-const calendar = await fetchCalendar();
+const [calendar, langData] = await Promise.all([fetchCalendar(), fetchLanguages()]);
 mkdirSync(OUT_DIR, { recursive: true });
 
 const outputs = [
   ['skyline-light.svg', renderSkyline(calendar, SKYLINE_LIGHT)],
   ['skyline-dark.svg', renderSkyline(calendar, SKYLINE_DARK)],
+  ['languages-light.svg', renderLanguages(langData, LANG_LIGHT)],
+  ['languages-dark.svg', renderLanguages(langData, LANG_DARK)],
 ];
 
 for (const [name, svg] of outputs) {
@@ -332,3 +491,4 @@ for (const [name, svg] of outputs) {
 }
 
 console.log(`Total contributions (${WEEKS}w): ${calendar.totalContributions}`);
+console.log(`Languages tracked: ${langData.langs.length} (${Math.round(langData.total / 1024)} KB)`);
