@@ -51,12 +51,11 @@
 
 <p align="center"><sub>Each building is a week. Taller means more contributions; lit windows scale with weekly intensity.</sub></p>
 
+<!--
+  Stats card hidden for now. Uncomment to re-enable. Uses <picture> so the
+  text stays readable on both light and dark GitHub themes.
+
 <p align="center">
-  <!--
-    Stats card from github-readme-stats. Two versions swapped by <picture>
-    so the text stays readable on both light and dark GitHub themes
-    (gray text on transparent bg was invisible in dark mode otherwise).
-  -->
   <a href="https://github.com/EGJJR">
     <picture>
       <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=EGJJR&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&hide_title=true&hide=issues&bg_color=00000000&title_color=c9d1d9&text_color=c9d1d9&icon_color=39d353" />
@@ -65,6 +64,7 @@
     </picture>
   </a>
 </p>
+-->
 
 <p align="center"><sub><i>Regenerated daily — see <a href="./scripts/activity-chart/">scripts/activity-chart/</a></i></sub></p>
 
