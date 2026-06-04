@@ -19,7 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     name: generate-github-profile-3d-contrib
     steps:
+      # Always operate on main — profile page reads SVGs from main, so we pin
+      # the target branch even if the default branch (currently `develop`) changes.
       - uses: actions/checkout@v5
+        with:
+          ref: main
 
       # Pinned to v0.9.2 for reproducibility; swap to @latest if you prefer rolling updates
       - uses: yoshi389111/github-profile-3d-contrib@v0.9.2
@@ -40,5 +44,6 @@ jobs:
           git add -A .
           # Only commit if something actually changed — keeps history clean
           if git commit -m "chore: regenerate 3d profile contribs"; then
-            git push
+            # Explicit ref because checkout used ref: main (detached HEAD otherwise)
+            git push origin HEAD:main
           fi
