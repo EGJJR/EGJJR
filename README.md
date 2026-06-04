@@ -29,7 +29,6 @@
 
 <br />
 
-<!--
   3D activity chart hidden for now. Uncomment the block below to re-enable.
   The daily workflow at .github/workflows/profile-3d.yml continues to regenerate
   the SVGs into ./profile-3d-contrib/ regardless.
@@ -67,7 +66,7 @@
 </details>
 
 <p align="center"><sub><i>Generated with <a href="https://github.com/yoshi389111/github-profile-3d-contrib">github-profile-3d-contrib</a></i></sub></p>
--->
+
 
 <!---
 EGJJR/EGJJR is a special repository because its `README.md` (this file) appears on your GitHub profile.
