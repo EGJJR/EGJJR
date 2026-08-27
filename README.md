@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  I'm a Platform Engineer at Milliman, where I believe function is its own kind of beauty; that the cleanest systems are also the most quietly elegant. My interests span web development, artificial intelligence, creative coding, design, history, business, and human-technology interaction. I'm drawn to building practical AI solutions and to exploring how the tools we make end up shaping the way we live.
+  I believe function is its own kind of beauty; that the cleanest systems are also the most quietly elegant. My interests span web development, artificial intelligence, creative coding, design, history, business, and human-technology interaction. I'm drawn to building practical AI solutions and to exploring how the tools we make end up shaping the way we live.
 </p>
 
 <p align="center">
