@@ -95,6 +95,7 @@ async function fetchCalendar() {
     } catch (err) {
       if (err.status !== 401) throw err;
       console.error('generate.mjs: ACTIVITY_TOKEN was rejected (401); using GITHUB_TOKEN');
+      console.error('::warning::MY_PERSONAL_ACCESS_TOKEN was rejected. The chart includes public contributions only. Replace that secret with a personal access token that can read your private repositories.');
       data = await gql(query, variables, TOKEN);
     }
   } else {

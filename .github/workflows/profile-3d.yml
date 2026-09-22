@@ -34,9 +34,10 @@ jobs:
       # Outputs profile-3d-contrib/skyline-{light,dark}.svg.
       - name: Generate activity chart
         env:
-          # Default workflow token reads the public contribution calendar.
-          # Optional PAT (secret must NOT start with GITHUB_) includes private activity
-          # when it is valid; a 401 falls back to the workflow token.
+          # github.token reads the public calendar and is the 401 fallback.
+          # MY_PERSONAL_ACCESS_TOKEN is a fine-grained PAT for the profile owner
+          # (all repositories, Contents: Read) so private activity is counted.
+          # Secret name must NOT start with GITHUB_.
           GITHUB_TOKEN: ${{ github.token }}
           ACTIVITY_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
