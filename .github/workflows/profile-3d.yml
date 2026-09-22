@@ -31,12 +31,14 @@ jobs:
           node-version: "22"
 
       # Custom isometric 26-week chart (scripts/activity-chart/generate.mjs).
-      # Outputs profile-3d-contrib/activity-{light,dark}.svg.
+      # Outputs profile-3d-contrib/skyline-{light,dark}.svg.
       - name: Generate activity chart
         env:
-          # Custom PAT (not the default GITHUB_TOKEN) so private-repo activity is counted.
-          # Secret name must NOT start with GITHUB_.
-          GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
+          # Default workflow token reads the public contribution calendar.
+          # Optional PAT (secret must NOT start with GITHUB_) includes private activity
+          # when it is valid; a 401 falls back to the workflow token.
+          GITHUB_TOKEN: ${{ github.token }}
+          ACTIVITY_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
           WEEKS: "26"
         run: node scripts/activity-chart/generate.mjs

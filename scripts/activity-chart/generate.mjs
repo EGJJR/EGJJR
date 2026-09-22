@@ -5,9 +5,11 @@
 //   profile-3d-contrib/skyline-dark.svg
 //
 // Env:
-//   GITHUB_TOKEN  (required) — PAT or workflow token. PAT recommended to count private repo activity.
-//   USERNAME      (required) — GitHub login to render.
-//   WEEKS         (optional, default 26) — rolling window length.
+//   GITHUB_TOKEN    (required) — workflow token or PAT used for the public calendar.
+//   ACTIVITY_TOKEN  (optional) — PAT tried first so private repo activity is counted.
+//                   A 401 falls back to GITHUB_TOKEN.
+//   USERNAME        (required) — GitHub login to render.
+//   WEEKS           (optional, default 26) — rolling window length.
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -19,6 +21,7 @@ const OUT_DIR = join(REPO_ROOT, 'profile-3d-contrib');
 
 const USERNAME = process.env.USERNAME;
 const TOKEN = process.env.GITHUB_TOKEN;
+const ACTIVITY_TOKEN = process.env.ACTIVITY_TOKEN;
 const WEEKS = Number(process.env.WEEKS ?? 26);
 
 if (!USERNAME) die('USERNAME env var is required');
@@ -31,17 +34,22 @@ function die(msg) {
 
 // ─── Fetch ──────────────────────────────────────────────────────────────────
 
-async function gql(query, variables) {
+async function gql(query, variables, token) {
   const res = await fetch('https://api.github.com/graphql', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${TOKEN}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
       'User-Agent': 'egjjr-activity-chart',
     },
     body: JSON.stringify({ query, variables }),
   });
-  if (!res.ok) die(`GitHub API ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    const body = await res.text();
+    const err = new Error(`GitHub API ${res.status}: ${body}`);
+    err.status = res.status;
+    throw err;
+  }
   const json = await res.json();
   if (json.errors) die(`GraphQL errors: ${JSON.stringify(json.errors)}`);
   return json.data;
@@ -74,11 +82,28 @@ async function fetchCalendar() {
     }
   `;
 
-  const data = await gql(query, {
+  const variables = {
     login: USERNAME,
     from: from.toISOString(),
     to: to.toISOString(),
-  });
+  };
+  let data;
+  const preferActivityToken = ACTIVITY_TOKEN && ACTIVITY_TOKEN !== TOKEN;
+  if (preferActivityToken) {
+    try {
+      data = await gql(query, variables, ACTIVITY_TOKEN);
+    } catch (err) {
+      if (err.status !== 401) throw err;
+      console.error('generate.mjs: ACTIVITY_TOKEN was rejected (401); using GITHUB_TOKEN');
+      data = await gql(query, variables, TOKEN);
+    }
+  } else {
+    try {
+      data = await gql(query, variables, TOKEN);
+    } catch (err) {
+      die(err.message);
+    }
+  }
   const cal = data?.user?.contributionsCollection?.contributionCalendar;
   if (!cal) die('No calendar returned — check USERNAME / token scopes.');
   return cal;
